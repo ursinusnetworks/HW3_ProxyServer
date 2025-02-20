@@ -27,7 +27,8 @@ void HTTPHeader_init(struct HTTPHeader* header) {
 void HTTPHeader_free(struct HTTPHeader* header) {
     // Step 1: Free all of the key/value strings that have been
     // dynamically allocated
-    HashMap_freeKeyValChars(&header->fields);
+    HashMap_freeKeyChars(&header->fields);
+    HashMap_freeValueChars(&header->fields);
 
     // Step 2: Free the hashmap itself
     HashMap_free(&header->fields);
@@ -83,7 +84,7 @@ char* HTTPHeader_getField(struct HTTPHeader* header, char* key) {
     memcpy(keyGet, key, keyLen);
     keyGet[keyLen] = '\0';
 
-    char* ret = (char*)HashMap_get(&header->fields, keyGet);
+    char* ret = HashMap_get(&header->fields, keyGet);
     free(keyGet);
     return ret;
 }
@@ -103,11 +104,7 @@ int HTTPHeader_removeField(struct HTTPHeader* header, char* key) {
     char* keyGet = (char*)malloc(keyLen+1);
     memcpy(keyGet, key, keyLen);
     keyGet[keyLen] = '\0';
-    char* value = HashMap_get(&header->fields, keyGet);
-    if (value != NULL) {
-        free(value);
-    }
-    ret = HashMap_remove(&header->fields, keyGet, 1);
+    ret = HashMap_remove(&header->fields, keyGet, 1, 1);
     free(keyGet);
     return ret;
 }
@@ -128,8 +125,7 @@ int HTTPHeader_parseRequest(struct HTTPHeader* header, char* request) {
     memcpy(requestCopy, request, N);
        
     // Step 1: Parse top two lines of the header
-    sscanf(requestCopy, "%1023s", header->type);
-    int nargs = sscanf(requestCopy, "GET %s HTTP/%i.%i\r\nHost:%s", header->path, &header->v1, &header->v2, header->host);
+    int nargs = sscanf(requestCopy, "%5s %1023s HTTP/%i.%i\r\nHost:%s", header->type, header->path, &header->v1, &header->v2, header->host);
     if (nargs < 4) {
         fprintf(stderr, "Error: HTML header line, nargs = %i\n%s", nargs, requestCopy);
         free(requestCopy);

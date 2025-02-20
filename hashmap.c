@@ -10,7 +10,7 @@
 struct Node {
     struct Node* next;
     char* key;
-    void* value;
+    char* value;
 };
 
 struct Bucket {
@@ -35,11 +35,18 @@ void Bucket_free(struct Bucket* bucket) {
     free(bucket);
 }
 
-void Bucket_freeKeyValChars(struct Bucket* bucket) {
+void Bucket_freeKeyChars(struct Bucket* bucket) {
     struct Node* node = bucket->head;
     while (node != NULL) {
         free(node->key);
-        free((char*)node->value);
+        node = node->next;
+    }
+}
+
+void Bucket_freeValueChars(struct Bucket* bucket) {
+    struct Node* node = bucket->head;
+    while (node != NULL) {
+        free(node->value);
         node = node->next;
     }
 }
@@ -48,13 +55,13 @@ void Bucket_print(struct Bucket* bucket) {
     struct Node* node = bucket->head;
     printf("==>");
     while (node != NULL) {
-        printf("(%s, %s) ==> ", node->key, (char*)node->value);
+        printf("(%s, %s) ==> ", node->key, node->value);
         node = node->next;
     }
     printf("\n");
 }
 
-void Bucket_addFirst(struct Bucket* bucket, char* key, void* value) {
+void Bucket_addFirst(struct Bucket* bucket, char* key, char* value) {
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
     newNode->key = key;
     newNode->value = value;
@@ -62,7 +69,7 @@ void Bucket_addFirst(struct Bucket* bucket, char* key, void* value) {
     bucket->head = newNode;
 }
 
-int Bucket_put(struct Bucket* bucket, char* key, void* value) {
+int Bucket_put(struct Bucket* bucket, char* key, char* value) {
     struct Node* node = bucket->head;
     int added = 1;
     while (node != NULL && added == 1) {
@@ -81,8 +88,8 @@ int Bucket_put(struct Bucket* bucket, char* key, void* value) {
     return added;
 }
 
-void* Bucket_get(struct Bucket* bucket, char* key) {
-    void* ret = NULL;
+char* Bucket_get(struct Bucket* bucket, char* key) {
+    char* ret = NULL;
     struct Node* node = bucket->head;
     int found = 0;
     while (node != NULL && found == 0) {
@@ -97,10 +104,13 @@ void* Bucket_get(struct Bucket* bucket, char* key) {
 }
 
 
-void Bucket_removeFirst(struct Bucket* bucket, int remKey) {
+void Bucket_removeFirst(struct Bucket* bucket, int remKey, int remValue) {
     if (bucket->head != NULL) {
         if (remKey == 1) {
             free(bucket->head->key);
+        }
+        if (remValue == 1) {
+            free(bucket->head->value);
         }
         void* tmp = bucket->head;
         bucket->head = bucket->head->next;
@@ -108,12 +118,12 @@ void Bucket_removeFirst(struct Bucket* bucket, int remKey) {
     }
 }
 
-int Bucket_remove(struct Bucket* bucket, char* key, int remKey) {
+int Bucket_remove(struct Bucket* bucket, char* key, int remKey, int remValue) {
     int ret = 0;
     if (bucket->head != NULL) {
         struct Node* node = bucket->head;
         if (strcmp(node->key, key) == 0) {
-            Bucket_removeFirst(bucket, remKey);
+            Bucket_removeFirst(bucket, remKey, remValue);
             ret = 1;
         }
         else {
@@ -121,6 +131,9 @@ int Bucket_remove(struct Bucket* bucket, char* key, int remKey) {
                 if (strcmp(node->next->key, key) == 0) {
                     if (remKey) {
                         free(node->next->key);
+                    }
+                    if (remValue) {
+                        free(node->next->value);
                     }
                     struct Node* temp = node->next;
                     node->next = node->next->next;
@@ -168,15 +181,26 @@ void HashMap_free(struct HashMap* map) {
 }
 
 /**
- * @brief Free all of the key/value pairs, assuming they are 
- * all chars
+ * @brief Free all of the key strings
  * 
  * @param map 
  */
-void HashMap_freeKeyValChars(struct HashMap* map) {
+void HashMap_freeKeyChars(struct HashMap* map) {
     struct Bucket** buckets = (struct Bucket**)map->buckets;
     for (int i = 0; i < map->NBuckets; i++) {
-        Bucket_freeKeyValChars(buckets[i]);
+        Bucket_freeKeyChars(buckets[i]);
+    }
+}
+
+/**
+ * @brief Free all of the value strings
+ * 
+ * @param map 
+ */
+void HashMap_freeValueChars(struct HashMap* map) {
+    struct Bucket** buckets = (struct Bucket**)map->buckets;
+    for (int i = 0; i < map->NBuckets; i++) {
+        Bucket_freeValueChars(buckets[i]);
     }
 }
 
@@ -202,7 +226,7 @@ long charHash(char* s) {
  * @param key Key
  * @param value Value
  */
-int HashMap_put(struct HashMap* map, char* key, void* value) {
+int HashMap_put(struct HashMap* map, char* key, char* value) {
     long i = charHash(key) % map->NBuckets;
     struct Bucket** buckets = (struct Bucket**)map->buckets;
     int added = Bucket_put(buckets[i], key, value);
@@ -216,9 +240,9 @@ int HashMap_put(struct HashMap* map, char* key, void* value) {
  * 
  * @param map 
  * @param key 
- * @return void* 
+ * @return char* 
  */
-void* HashMap_get(struct HashMap* map, char* key) {
+char* HashMap_get(struct HashMap* map, char* key) {
     long i = charHash(key) % map->NBuckets;
     struct Bucket** buckets = (struct Bucket**)map->buckets;
     return Bucket_get(buckets[i], key);
@@ -231,12 +255,13 @@ void* HashMap_get(struct HashMap* map, char* key) {
  * @param map 
  * @param key Key to remove
  * @param remKey If 1, remove dynamic memory associated to key in the map
+ * @param remValue If 1, remove dynamic memory associated to value in the map
  * @return 1 if the item was there, 0 otherwise
  */
-int HashMap_remove(struct HashMap* map, char* key, int remKey) {
+int HashMap_remove(struct HashMap* map, char* key, int remKey, int remValue) {
     long i = charHash(key) % map->NBuckets;
     struct Bucket** buckets = (struct Bucket**)map->buckets;
-    return Bucket_remove(buckets[i], key, remKey);
+    return Bucket_remove(buckets[i], key, remKey, remValue);
 }
 
 /**

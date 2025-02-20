@@ -168,6 +168,7 @@ int main(int argc, char** argv) {
                     }
                 }
                 while(res > 0);
+                fclose(fout);
                 printf("Finished serving GET request\n");
             }
         }

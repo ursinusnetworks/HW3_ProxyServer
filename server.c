@@ -7,12 +7,14 @@
 #include <netdb.h>
 #include <errno.h>
 #include <pthread.h>
+#include <regex.h>
 #include "arraylist.h"
 #include "util.h"
 #include "http.h"
 
 struct cmdArgs {
     char* port; // 60000 by default
+    char* blockpattern; // "" by default
     struct timeval timeout; // 10 (second) by default
 };
 
@@ -23,6 +25,7 @@ struct cmdArgs parseArgs(int argc, char** argv) {
     ret.port = "60000";
     ret.timeout.tv_sec = 10;
     ret.timeout.tv_usec = 0;
+    ret.blockpattern = "";
 
     // Step 2: Parse user specified values
     // Advance to the next element
@@ -56,7 +59,16 @@ struct cmdArgs parseArgs(int argc, char** argv) {
                     exit(0);
                 }
             }
-
+            else if (strcmp(*argv, "--blockpattern") == 0) {
+                argv++; argc--;
+                if (argc > 0) {
+                    ret.blockpattern = *argv;
+                }
+                else {
+                    printf("Error: Expecting field after --blockpattern\n");
+                    exit(0);
+                }
+            }
         }
         else {
             printf("Warning: Unrecognized field %s\n", *argv);
@@ -67,10 +79,8 @@ struct cmdArgs parseArgs(int argc, char** argv) {
     return ret;
 }
 
-
 int main(int argc, char** argv) {
-    // Parse Parameters and initialize variables
+    // Step 1: Parse Parameters and initialize variables
     struct cmdArgs args = parseArgs(argc, argv);
-    
     // TODO: Fill this in
 }

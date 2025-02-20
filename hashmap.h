@@ -26,12 +26,18 @@ void HashMap_init(struct HashMap* map);
 void HashMap_free(struct HashMap* map);
 
 /**
- * @brief Free all of the key/value pairs, assuming they are 
- * all chars
+ * @brief Free all of the key strings
  * 
  * @param map 
  */
-void HashMap_freeKeyValChars(struct HashMap* map);
+void HashMap_freeKeyChars(struct HashMap* map);
+
+/**
+ * @brief Free all of the value strings, assuming they are chars
+ * 
+ * @param map 
+ */
+void HashMap_freeValueChars(struct HashMap* map);
 
 
 /**
@@ -43,7 +49,7 @@ void HashMap_freeKeyValChars(struct HashMap* map);
  *
  * @return 1 if this is a new key, or 0 if not
  */
-int HashMap_put(struct HashMap* map, char* key, void* value);
+int HashMap_put(struct HashMap* map, char* key, char* value);
 
 /**
  * @brief Return the value associated to a key, or NULL
@@ -51,9 +57,9 @@ int HashMap_put(struct HashMap* map, char* key, void* value);
  * 
  * @param map 
  * @param key 
- * @return void* 
+ * @return char* 
  */
-void* HashMap_get(struct HashMap* map, char* key);
+char* HashMap_get(struct HashMap* map, char* key);
 
 /**
  * @brief Remove the key/value pair associated to a key if
@@ -62,9 +68,10 @@ void* HashMap_get(struct HashMap* map, char* key);
  * @param map 
  * @param key Key to remove
  * @param remKey If 1, remove dynamic memory associated to key in the map
+ * @param remValue If 1, remove dynamic memory associated to value in the map
  * @return 1 if the item was there, 0 otherwise
  */
-int HashMap_remove(struct HashMap* map, char* key, int remKey);
+int HashMap_remove(struct HashMap* map, char* key, int remKey, int remValue);
 
 /**
  * @brief Print out a string representation of the hashmap for debugging
@@ -73,6 +80,14 @@ int HashMap_remove(struct HashMap* map, char* key, int remKey);
  */
 void HashMap_print(struct HashMap* map);
 
+
+/**
+ * @brief Copy all of the key/value pairs from one map to another
+ * 
+ * @param self Map to draw from
+ * @param other Map into which to copy key/value pairs in self
+ */
+void HashMap_copyPairs(struct HashMap* self, struct HashMap* other);
 
 /**
  * @brief Write all pairs to a string buffer, in no particular order
