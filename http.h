@@ -58,10 +58,9 @@ char* HTTPHeader_getField(struct HTTPHeader* header, char* key);
  * @brief Remove a key/value pair if it exists
  * 
  * @param header
- * @param key Key to get. Should be null terminated
+ * @param key Key to remove. Should be null terminated
  * 
- * @return Value associated to the key, or NULL if the key is not in
- * the fields
+ * @return 1 if the item was there, 0 otherwise
  */
 int HTTPHeader_removeField(struct HTTPHeader* header, char* key);
 
