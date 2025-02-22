@@ -1,8 +1,8 @@
 #include <sys/socket.h>
-#include <openssl/evp.h>
 #include <string.h>
 #include "util.h"
 #include "arraylist.h"
+#include "md5-c/md5.h"
 
 #define BUFSIZE 1024
 
@@ -57,26 +57,18 @@ int receiveChunkUntilClose(ArrayListBuf* abuf, int sockfd) {
 }
 
 /**
- * Compute the md5 hash of a string using the openssl library
- * https://manpages.ubuntu.com/manpages/focal/man3/EVP_MD_CTX_copy.3ssl.html
+ * Compute the md5 hash of a string using Zunawe's submodule:
+ * https://github.com/Zunawe/md5-c
  *
  * @param s String to encode
  * @param res Result to which to save 32 character hash string 
  * (should be at least 33 big)
  */
-void bytes2md5(char* s, char* res) {
-    EVP_MD_CTX* mdctx;
-    const EVP_MD* md;
-    unsigned char md_value[EVP_MAX_MD_SIZE];
-    unsigned int md_len, i;
-    md = EVP_get_digestbyname("md5");
-    mdctx = EVP_MD_CTX_new();
-    EVP_DigestInit_ex(mdctx, md, NULL);
-    EVP_DigestUpdate(mdctx, s, strlen(s));
-    EVP_DigestFinal_ex(mdctx, md_value, &md_len);
-    EVP_MD_CTX_free(mdctx);
-    for (i = 0; i < md_len; i++) {
-        sprintf(&res[i*2], "%02x", md_value[i]);
+void bytes2md5String(char* s, char* res) {
+    uint8_t bytes[16];
+    md5String(s, bytes);
+    for (int i = 0; i < 16; i++) {
+        sprintf(&res[i*2], "%02x", bytes[i]);
     }
 }
 
