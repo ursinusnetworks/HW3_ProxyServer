@@ -25,14 +25,14 @@ ssize_t sendMessage(char* buff, ssize_t N, ssize_t sockfd);
 int receiveChunkUntilClose(ArrayListBuf* abuf, int sockfd);
 
 /**
- * Compute the md5 hash of a string using the openssl library
- * https://manpages.ubuntu.com/manpages/focal/man3/EVP_MD_CTX_copy.3ssl.html
+ * Compute the md5 hash of a string using Zunawe's submodule:
+ * https://github.com/Zunawe/md5-c
  *
  * @param s String to encode
  * @param res Result to which to save 32 character hash string 
  * (should be at least 33 big)
  */
-void bytes2md5(char* s, char* res);
+void bytes2md5String(char* s, char* res);
 
 
 struct HTTPDate {

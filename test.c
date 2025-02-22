@@ -10,7 +10,7 @@ int main() {
     // Testing simple md5 hash
     char* s = "www.ctralie.com:/index.html";
     char md5[33];
-    bytes2md5(s, md5);
+    bytes2md5String(s, md5);
     printf("md5 = %s\n", md5);
 
     // Testing date parsing
