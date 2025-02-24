@@ -17,7 +17,7 @@ struct Bucket {
     struct Node* head;
 };
 
-struct Bucket* Bucket_init() {
+struct Bucket* Bucket_init(void) {
     struct Bucket* bucket = (struct Bucket*)malloc(sizeof(struct Bucket));
     bucket->head = NULL;
     return bucket;

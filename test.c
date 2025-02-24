@@ -6,7 +6,7 @@
 #include "hashmap.h"
 
 
-int main() {
+int main(int argc, char** argv) {
     // Testing simple md5 hash
     char* s = "www.ctralie.com:/index.html";
     char md5[33];
