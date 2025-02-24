@@ -4,7 +4,7 @@
 #include "arraylist.h"
 #include "http.h"
 
-int main() {
+int main(int argc, char** argv) {
     char* req=  "GET /cool/pr0.html HTTP/1.1\r\n"
                 "Host: 127.0.0.1:60000\r\n"
                 "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0\r\n"
