@@ -7,7 +7,7 @@
 // A struct general enough to encompass
 // both HTTP request and HTTP response headers
 struct HTTPHeader {
-    char type[6];
+    char type[64];
     char host[1024];
     char port[6];
     char path[1024];

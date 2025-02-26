@@ -124,7 +124,7 @@ int HTTPHeader_parseRequest(struct HTTPHeader* header, char* request) {
     memcpy(requestCopy, request, N);
        
     // Step 1: Parse top two lines of the header
-    int nargs = sscanf(requestCopy, "%5s %1023s HTTP/%i.%i\r\nHost:%s", header->type, header->path, &header->v1, &header->v2, header->host);
+    int nargs = sscanf(requestCopy, "%63s %1023s HTTP/%i.%i\r\nHost:%1023s", header->type, header->path, &header->v1, &header->v2, header->host);
     if (nargs < 4) {
         fprintf(stderr, "Error: HTML header line, nargs = %i\n%s", nargs, requestCopy);
         free(requestCopy);

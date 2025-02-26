@@ -29,6 +29,8 @@ int main(int argc, char** argv) {
     HTTPHeader_parseRequest(&header, req);
     HTTPHeader_putField(&header, "Connection", "close"); // Change connection to close
     printf("Connection value: %s\n", HTTPHeader_getField(&header, "Connection"));
+    printf("host: %s\n", header.host);
+    printf("port: %s\n", header.port);
     printf("Nonexistent value: %p\n", HTTPHeader_getField(&header, "nonexistent"));
     printf("Removing Sec-GPC: %i\n", HTTPHeader_removeField(&header, "Sec-GPC"));
     printf("Removing nonexistent field: %i\n\n\n", HTTPHeader_removeField(&header, "nonexistent field"));
