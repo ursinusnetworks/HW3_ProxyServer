@@ -19,7 +19,7 @@ util.o: util.c util.h hashmap.o arraylist.o md5.o
 	$(CC) $(CFLAGS) -c util.c 
 
 server: server.c hashmap.o arraylist.o http.o util.o md5.o
-	$(CC) $(CFLAGS) -o server server.c hashmap.o arraylist.o http.o util.o md5.o
+	$(CC) $(CFLAGS) -o server server.c hashmap.o arraylist.o http.o util.o md5.o -lpthread
 
 tester: arraylist.o tester.c
 	$(CC) $(CFLAGS) -o tester tester.c arraylist.o
